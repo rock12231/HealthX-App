@@ -1,0 +1,241 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Doctor </title>
+{% endblock %}
+
+{% block body %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title">
+            <span class="page-title-icon bg-gradient-primary text-white me-2">
+                <i class="mdi mdi-home"></i>
+            </span> Dashboard
+        </h3>
+        <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-3 stretch-card grid-margin">
+            <div class="card bg-gradient-danger card-img-holder text-white">
+                <div class="card-body">
+                    <img src="{% static '/images/dashboard/circle.svg' %}" class="card-img-absolute"
+                        alt="circle-image" />
+                    <h4 class="font-weight-normal mb-3">Total Record <i
+                            class="mdi mdi-chart-line mdi-24px float-right"></i>
+                    </h4>
+                    <h2 class="mb-5">{{total_record}}</h2>
+                    <h6 class="card-text">Increased by 60%</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stretch-card grid-margin">
+            <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                    <img src="{% static '/images/dashboard/circle.svg' %}" class="card-img-absolute"
+                        alt="circle-image" />
+                    <h4 class="font-weight-normal mb-3">Toatal Male Record
+                        <i class="mdi mdi-gender-male mdi-24px float-right"></i>
+                    </h4>
+                    <h2 class="mb-5">{{total_male}}</h2>
+                    <h6 class="card-text">Decreased by 10%</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stretch-card grid-margin">
+            <div class="card bg-gradient-success card-img-holder text-white">
+                <div class="card-body">
+                    <img src="{% static '/images/dashboard/circle.svg' %}" class="card-img-absolute"
+                        alt="circle-image" />
+                    <h4 class="font-weight-normal mb-3">Total Female Record
+                        <i class="mdi mdi-gender-female mdi-24px float-right"></i>
+                    </h4>
+                    <h2 class="mb-5">{{total_female}}</h2>
+                    <h6 class="card-text">Increased by 5%</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 stretch-card grid-margin">
+            <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                    <img src="{% static '/images/dashboard/circle.svg' %}" class="card-img-absolute" alt="circle-image" />
+                    <h4 class="font-weight-normal mb-3">Total Patient Record
+                        <i class="mdi mdi-account mdi-24px float-right"></i>
+                    </h4>
+                    <h2 class="mb-5">{{total_patient}}</h2>
+                    <h6 class="card-text">Increased by 1%</h6>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-7 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix">
+                        <h4 class="card-title float-left">Heart Attack ❤️ Recovery Record 2022</h4>
+                        <div id="visit-sale-chart-legend"
+                            class="rounded-legend legend-horizontal legend-top-right float-right"></div>
+                    </div>
+                    <canvas id="visit-sale-chart" class="mt-4"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Traffic Sources</h4>
+                    <canvas id="traffic-chart"></canvas>
+                    <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Patient List</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th> Name </th>
+                                    <th> Profile</th>
+                                    <th> Date of Joining </th>
+                                    <th> Status </th>
+                                    <th> Last Update </th>
+                                    <th> Tracking ID </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                    {% for patient in patients %}
+                                    <tr>
+                                        <td>
+                                            {% if patient.sex == 0 %}
+                                                <img src="{% static '/images/faces/face20.jpg' %}" class="me-2" alt="image">
+                                            {% else %}
+                                                <img src="{% static '/images/faces/face1.jpg' %}" class="me-2" alt="image">
+                                            {% endif %}
+                                          
+                                            {{patient.username|title}}
+                                        </td>
+                                        <td>
+                                            <a href="predict/{{patient.link}}" class="btn btn-outline-danger btn-rounded border-0 btn-icon">
+                                                <i class="mdi mdi-36px mdi-heart-half-full text-danger"></i>
+                                            </a>
+                                        </td>
+                                        <td> {{patient.date_joined}} </td>
+                                        <td>
+                                            <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="uid" value="{{patient.id}}">
+                                            {% if patient.status == 'done' %}
+                                            <select onchange="this.form.submit()" name="status" class="mdi-radius font-weight-bold form-select text-dark form-select-sm badge badge-gradient-success" aria-label=".form-select-sm example">
+                                                <option selected>{{patient.status|title}}</option>
+                                                <option value="process">Process</option>
+                                                <option value="onhold">On Hold</option>
+                                                <option value="pending">Pending</option>
+                                            </select>
+                                                <!-- <label class="badge badge-gradient-success"></label> -->
+                                            {% endif %}
+                                            {% if patient.status == 'process' %}
+                                            <select onchange="this.form.submit()" name="status" class="form-select text-dark form-select-sm badge badge-gradient-warning" aria-label=".form-select-sm example">
+                                                <option selected>{{patient.status|title}}</option>
+                                                <option value="done">Done</option>
+                                                <option value="onhold">On Hold</option>
+                                                <option value="pending">Pending</option>
+                                            </select>
+                                            <!-- <label class="badge badge-gradient-warning"></label> -->
+                                            {% endif %}
+                                            {% if patient.status == 'onhold' %}
+                                            <select onchange="this.form.submit()" name="status" class="form-select text-dark form-select-sm badge badge-gradient-info" aria-label=".form-select-sm example">
+                                                <option selected>{{patient.status|title}}</option>
+                                                <option value="done">Done</option>
+                                                <option value="process">Process</option>
+                                                <option value="pending">Pending</option>
+                                            </select>
+                                                <!-- <label class="badge badge-gradient-info"></label> -->
+                                            {% endif %}
+                                            {% if patient.status == 'pending' %}
+                                            <select onchange="this.form.submit()" name="status" class="form-select text-dark form-select-sm badge badge-gradient-primary" aria-label=".form-select-sm example">
+                                                <option selected>{{patient.status|title}}</option>
+                                                <option value="done">Done</option>
+                                                <option value="process">Process</option>
+                                                <option value="onhold">On Hold</option>
+                                            </select>
+                                            <!-- <label class="badge badge-gradient-primary"></label> -->
+                                            {% endif %}
+                                        </form>
+                                        </td>
+                                        
+                                        <td> {{patient.last_login}} </td>
+                                        <td> <i>PID-{{patient.id}}</i> </td>
+                                    </tr>
+                                    {% endfor %}
+                                   
+                                       
+                                <!-- <tr>
+                                    <td>
+                                        <img src="{% static '/images/faces/face2.jpg' %}" class="me-2" alt="image">
+                                        Stella Johnson
+                                    </td>
+                                    <td> High loading time </td>
+                                    <td>
+                                        <label class="badge badge-gradient-warning">PROGRESS</label>
+                                    </td>
+                                    <td> Dec 12, 2017 </td>
+                                    <td> WD-12346 </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <img src="{% static '/images/faces/face3.jpg' %}" class="me-2" alt="image">
+                                        Marina Michel
+                                    </td>
+                                    <td> Website down for one week </td>
+                                    <td>
+                                        <label class="badge badge-gradient-info">ON HOLD</label>
+                                    </td>
+                                    <td> Dec 16, 2017 </td>
+                                    <td> WD-12347 </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <img src="{% static '/images/faces/face4.jpg' %}" class="me-2" alt="image">
+                                        John Doe
+                                    </td>
+                                    <td> Loosing control on server </td>
+                                    <td>
+                                        <label class="badge badge-gradient-danger">REJECTED</label>
+                                    </td>
+                                    <td> Dec 3, 2017 </td>
+                                    <td> WD-12348 </td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="footer">
+    <div class="container-fluid d-flex justify-content-between">
+    <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © Health Sense 2023</span>
+    <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"><a href="/">Health Sense</a></span>
+    </div>
+</footer>
+{% endblock %}

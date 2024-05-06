@@ -1,0 +1,329 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Prediction </title>
+{% endblock %}
+
+
+{% block body %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title">
+            <span class="page-title-icon bg-gradient-primary text-white me-2">
+                <i class="mdi mdi-home"></i>
+            </span> Prediction
+        </h3>
+        <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    {% if not result %}
+    <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Dataset</h4>
+                    <p class="card-description">Last 5 dataset, Age : {{patient.age}} , Sex : {% if patient.sex == 1 %}Male{% else %}Female{% endif %} </code></p>
+                    {% if data|length %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                {% for column in data.columns %}
+                                <th>{{ column|title }}</th>
+                                {% if column == 'target' %}
+                                <th>Predict</th>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for _, row in data.iterrows %}
+                            <tr>
+                                {% for value in row %}
+                                <td class="text-success">{{ value|floatformat }}</td>
+
+                                <!-- check row last vallue is 0 print heart otherwise brokenheart -->
+                                {% if forloop.last %}
+                                {% if value == 0 %}
+                                <td><i class="mdi mdi-heart mdi-36px text-danger"></i></td>
+                                {% else %}
+                                <td><i class="mdi mdi-heart-broken mdi-36px"></i></td>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div>
+                        <div class="alert alert-warning text-center" role="alert">
+                            User file not found <a href="#" class="alert-link"> No Data !!! </a>. Please upload file.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Line chart</h4>
+                    <canvas id="lineChart" style="height: 247px; display: block; width: 494px;" width="617" height="308"
+                        class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Bar chart</h4>
+                    <canvas id="barChart" style="height: 247px; display: block; width: 494px;" width="617" height="308"
+                        class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Area chart</h4>
+                    <canvas id="areaChart" style="height: 247px; display: block; width: 494px;" width="617" height="308"
+                        class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Doughnut chart</h4>
+                    <canvas id="doughnutChart" style="height: 247px; display: block; width: 494px;" width="617"
+                        height="308" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Pie chart</h4>
+                    <canvas id="pieChart" style="height: 247px; display: block; width: 494px;" width="617" height="308"
+                        class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                            <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Scatter chart</h4>
+                    <canvas id="scatterChart" style="height: 247px; display: block; width: 494px;" width="617"
+                        height="308" class="chartjs-render-monitor"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Enter Details</h4>
+                <p class="card-description"> Basic information from the dataset or you can input your own data </p>
+                <form method="POST" class="forms-sample">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-12">
+                       
+                            <div class="form-group">
+                                <label for="chestpain">Chest Pain</label>
+                                <select class="form-control" id="chestpain" name="cp">
+                                    <option value="0">0 typical angina</option>
+                                    <option value="1">1 atypical angina</option>
+                                    <option value="2">2 non-anginal pain</option>
+                                    <option value="3">3 asymptomatic</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="trestbps">Resting blood pressure (in mm Hg)</label>
+                                <input type="text" class="form-control" id="trestbps" name="trestbps" placeholder="Blood Pressure" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="chol">Cholestoral in mg/dl  (+-200)</label>
+                                <input type="text" class="form-control" id="chol" name="chol" placeholder="Cholestoral in mg/dl" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fbs">Fasting Blood Sugar</label>
+                                <select class="form-control" id="fbs" name="fbs">
+                                    <option value="1">1 True</option>
+                                    <option value="0">0 False</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rest_ecg">Resting electrocardiographic</label>
+                                <select class="form-control" id="rest_ecg" name="restecg">
+                                    <option value="0">0 normal</option>
+                                    <option value="1">1 having ST-T wave abnormality</option>
+                                    <option value="1">2 definite left ventricular hypertrophy by Estes' criteria
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="thalach">Maximum heart rate achieved (Normal 60 to 100)</label>
+                                <input type="text" class="form-control" id="thalach" placeholder="Maximum heart rate achieved" name="thalach" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exang">Exercise induced angina</label>
+                                <select class="form-control" id="exang" name="exang">
+                                    <option value="0">True</option>
+                                    <option value="1">False</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="oldpeak">ST depression induced by exercise relative to rest (0 to 6.2)</label>
+                                <input type="text" class="form-control" id="oldpeak" placeholder="0 to 6.2" name="oldpeak" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="slope">slope</label>
+                                <select class="form-control" id="slope" name="slope">
+                                    <option value="0">0 downsloping</option>
+                                    <option value="1">1 flat</option>
+                                    <option value="2">2 upsloping</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ca">CA The number of major vessels</label>
+                                <select class="form-control" id="ca" name="ca">
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="thal">Thalassemia</label>
+                                <select class="form-control" id="thal" name="thal">
+                                    <option value="0">NULL</option>
+                                    <option value="1">1 fixed defect</option>
+                                    <option value="2">2 normal blood flow</option>
+                                    <option value="3">3 reversible defect</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-gradient-primary me-2">Pridict</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> 
+    {% else %}
+        <div class="row">
+            {% if val == 1 %}
+                <div class="alert alert-danger border-2 d-flex align-items-center" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                    </svg>
+                    <div>
+                       {{ result }}
+                    </div>
+                </div>
+            {% endif %}
+            {% if val == 0 %}
+                <div class="alert alert-primary border-2 d-flex align-items-center" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                    </svg>
+                    <div>
+                        {{ result }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="text-center">
+            <button type="button" class="btn btn-gradient-info btn-rounded btn-fw" action="action" onclick="window.history.go(-1); return false;">Back To Page</button>
+        </div>
+    {% endif %}
+
+
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="footer">
+    <div class="container-fluid d-flex justify-content-between">
+    <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © Health Sense 2023</span>
+    <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"><a href="/">Health Sense</a></span>
+    </div>
+</footer>
+
+{% endblock %}

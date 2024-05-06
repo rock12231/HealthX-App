@@ -1,0 +1,152 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Patiet </title>
+{% endblock %}
+
+
+{% block body %}
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h3 class="page-title">
+                <span class="page-title-icon bg-gradient-primary text-white me-2">
+                    <i class="mdi mdi-home"></i>
+                </span> Dashboard
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <span></span>Overview <i
+                            class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Profile Details</h4>
+                    <p class="card-description"> Basic information Patient </p>
+                    <form method="POST" class="forms-sample">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-lg-12">
+        
+                                <div class="form-group">
+                                    <label for="sex">Gender </label>
+                                    <select class="form-control" id="sex" name="sex">
+                                        <option {% if sex == 0 %} selected {% endif %} value="0">Female</option>
+                                        <option {% if sex == 1 %} selected {% endif %} value="1">Male</option>
+                                    </select>
+                                </div>
+        
+                                <div class="form-group">
+                                    <label for="age">Age</label>
+                                    <input type="text" class="form-control" id="age" name="age" placeholder="Age"
+                                        value="{{age}}" required>
+                                </div>
+        
+                            </div>
+                        </div>
+                        {% if age == 0 %}
+                        <div>
+                            <div class="alert alert-warning text-center" role="alert">
+                                <p class="alert-link"> Please Upadet Your Profile !!! </p> Othere wise doctor unable to access your Profile.
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-gradient-primary me-2">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Dataset</h4>
+                        <p class="card-description">Last 5 dataset, Age : {{age}} , Sex : {% if sex == 1 %}Male{% else %}Female{% endif %} </code></p>
+                        {% if data|length %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                {% for column in data.columns %}
+                                <th>{{ column|title }}</th>
+                                {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for _, row in data.iterrows %}
+                                <tr>
+                                    {% for value in row %}
+                                    <td class="text-success">{{ value|floatformat }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                                
+                               
+                                <!-- <tr>
+                                    <td>Dave</td>
+                                    <td>53275535</td>
+                                    <td class="text-success"> 98.05% <i class="mdi mdi-arrow-up"></i></td>
+                                    <td><label class="badge badge-warning">In progress</label></td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div>
+                            <div class="alert alert-warning text-center" role="alert">
+                                User file not found <a href="#" class="alert-link"> No Data !!! </a>. Please upload file.
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="clearfix">
+                            <h4 class="card-title float-left">Heart Attack ❤️ Recovery Record 2022</h4>
+                            <div id="visit-sale-chart-legend"
+                                class="rounded-legend legend-horizontal legend-top-right float-right"></div>
+                        </div>
+                        <canvas id="visit-sale-chart" class="mt-4"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">4 Type Of Chest Pain</h4>
+                        <canvas id="traffic-chart"></canvas>
+                        <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+
+
+
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <footer class="footer">
+        <div class="container-fluid d-flex justify-content-between">
+            <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © Health Sense 2023</span>
+            <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"><a href="/">Health Sense</a></span>
+        </div>
+    </footer>
+{% endblock %}
