@@ -19,7 +19,7 @@ class Prediction(View):
         print(patient)
         print(patient.age)
         print(patient.sex)
-        csv_file_path = f'BaseAPI/data/{patient.username}.csv'
+        csv_file_path = f'BaseAPI/data/{patient}.csv'
         # file_exists = os.path.isfile(csv_file_path)
         if not os.path.isfile(csv_file_path):
             # Create a new file and write data to it
@@ -99,9 +99,9 @@ class Prescription(View):
         return render(request, 'Predict/prescription.html', {'chats': chats})
     
     def post(self, request, link):
-        patient = request.user.username
-        if request.user.is_staff:
-            patient = ''
+        # patient = request.user.username
+        # if request.user.is_staff:
+        #     patient = ''
         chats = ChatModel.objects.all()
         ai_prescription = ''
         if request.method == 'POST':
@@ -118,7 +118,6 @@ class Prescription(View):
                     chat.save()
             if request.POST.get("form_type") == 'formTwo':
                     print('formTwo')
-                    print(request.user.username)
                     csv_file_path = f'BaseAPI/data/{patient}.csv'
                     if not os.path.isfile(csv_file_path):
                         # Create a new file and write data to it
