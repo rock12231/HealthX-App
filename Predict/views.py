@@ -11,14 +11,14 @@ import google.generativeai as genai
 genai.configure(api_key=os.getenv('Gemini_API'))
 
 loaded_model = joblib.load('Home/data/model1.sav')
-
+patient = ''
 class Prediction(View):
     def get(self,request,link):
         patient = ProfileModel.objects.get(link=link)
         print(patient)
         print(patient.age)
         print(patient.sex)
-        csv_file_path = f'BaseAPI/data/{patient}.csv'
+        csv_file_path = f'BaseAPI/data/{patient.username}.csv'
         # file_exists = os.path.isfile(csv_file_path)
         if not os.path.isfile(csv_file_path):
             # Create a new file and write data to it
@@ -98,7 +98,9 @@ class Prescription(View):
         return render(request, 'Predict/prescription.html', {'chats': chats})
     
     def post(self, request, link):
-        # patient = ProfileModel.objects.get(link=link)
+        patient = request.user.username
+        if request.user.is_staff:
+            patient = ''
         chats = ChatModel.objects.all()
         ai_prescription = ''
         if request.method == 'POST':
@@ -116,7 +118,7 @@ class Prescription(View):
             if request.POST.get("form_type") == 'formTwo':
                     print('formTwo')
                     print(request.user.username)
-                    csv_file_path = f'BaseAPI/data/vipin.csv'
+                    csv_file_path = f'BaseAPI/data/{patient}.csv'
                     if not os.path.isfile(csv_file_path):
                         # Create a new file and write data to it
                         with open(csv_file_path, 'w', newline='') as file:
