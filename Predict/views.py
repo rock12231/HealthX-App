@@ -8,6 +8,7 @@ import pandas as pd
 import os
 import csv
 import google.generativeai as genai
+from dotenv import load_dotenv
 genai.configure(api_key=os.getenv('Gemini_API'))
 
 loaded_model = joblib.load('Home/data/model1.sav')
@@ -157,8 +158,11 @@ class Prescription(View):
                         
                     ])
                     patient_details =patient_df.to_string()
+
+                    print("+++++++++++++++++++++++++")
                     print(patient_details)
-                    convo.send_message("You're a professional heart specialist doctor, you're provided with the task to analyze the heart feature data and provide the response in the json format contaning the header - Reasoning, Remedies, Action_to_Take.The provided data is sufficient to take a judgement on. The data of the patient is here - {patient_details}")
+                    print("+++++++++++++++++++++++++")
+                    convo.send_message("You're a professional heart specialist doctor, you're provided with the task to analyze the heart feature data and provide the response in the json format contaning the header - Reasoning, Remedies, Action_to_Take.The provided data is sufficient to take a judgement on. The data of the patient is here - {patient_details}. You're a doctor and don't provide the disclamair or any additional information, only the json is required. Don't mention anything about the insufficient Data.")
                     print(convo.last.text)
 
                     ai_prescription = convo.last.text
