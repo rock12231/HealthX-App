@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block title %}
+    <title>Purple Admin</title>
+    {% endblock %}
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{% static '/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static '/vendors/css/vendor.bundle.base.css' %}">
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="{% static '/images/favicon.ico' %}" />
+</head>
+
+<body>
+
+    {% block content %}
+
+    {% endblock %}
+
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{% static '/vendors/js/vendor.bundle.base.js' %}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="{% static '/vendors/chart.js/Chart.min.js' %}"></script>
+    <script src="{% static '/js/jquery.cookie.js' %}" type="text/javascript"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="{% static '/js/off-canvas.js' %}"></script>
+    <script src="{% static '/js/hoverable-collapse.js' %}"></script>
+    <script src="{% static '/js/misc.js' %}"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="{% static '/js/dashboard.js' %}"></script>
+    <script src="{% static '/js/todolist.js' %}"></script>
+    <!-- End custom js for this page -->
+    <script src="{% static '/js/chart.js' %}"></script>
+</body>
+
+</html>
