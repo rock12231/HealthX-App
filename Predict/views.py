@@ -8,8 +8,7 @@ import pandas as pd
 import os
 import csv
 import google.generativeai as genai
-genai.configure(api_key=Gemini_API)
-
+genai.configure(api_key=os.getenv('Gemini_API'))
 
 loaded_model = joblib.load('Home/data/model1.sav')
 
@@ -98,68 +97,73 @@ class Prescription(View):
         chats = ChatModel.objects.all()
         return render(request, 'Predict/prescription.html', {'chats': chats})
     
-    def post(self, request, link):  
+    def post(self, request, link):
+        # patient = ProfileModel.objects.get(link=link)
         chats = ChatModel.objects.all()
-        for chat in chats:
-            print(chat.user, chat.message)   
+        ai_prescription = ''
         if request.method == 'POST':
-            message = request.POST.get('chat','')  # Retrieve the message from the POST data
-            print(message)
-            if message:  # Check if the message is not empty
-                user = request.user
-                if request.user.is_staff:
-                    type = 1
-                else:
-                    type = 0
-                chat = ChatModel(user=user,type=type, message=message)
-                chat.save()
+            if request.POST.get("form_type") == 'formOne':
+                message = request.POST.get('chat','')  # Retrieve the message from the POST data
+                print(message)
+                if message:  # Check if the message is not empty
+                    user = request.user
+                    if request.user.is_staff:
+                        type = 1
+                    else:
+                        type = 0
+                    chat = ChatModel(user=user,type=type, message=message)
+                    chat.save()
+            if request.POST.get("form_type") == 'formTwo':
+                    print('formTwo')
+                    print(request.user.username)
+                    csv_file_path = f'BaseAPI/data/vipin.csv'
+                    if not os.path.isfile(csv_file_path):
+                        # Create a new file and write data to it
+                        with open(csv_file_path, 'w', newline='') as file:
+                            writer = csv.writer(file)
+                            writer.writerow(['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'])        
+                    patient_df = pd.read_csv(csv_file_path, on_bad_lines='skip')
+                    
+                    generation_config = {
+                    "temperature": 0.2,
+                    "top_p": 0.95,
+                    "top_k": 0,
+                    "max_output_tokens": 8192,
+                    }
+                    safety_settings = [
+                    {
+                        "category": "HARM_CATEGORY_HARASSMENT",
+                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_HATE_SPEECH",
+                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                    },
+                    ]
+
+                    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
+                                                generation_config=generation_config,
+                                                safety_settings=safety_settings)
+
+                    convo = model.start_chat(history=[
+                        
+                    ])
+                    patient_details =patient_df.to_string()
+                    print(patient_details)
+                    convo.send_message("You're a professional heart specialist doctor, you're provided with the task to analyze the heart feature data and provide the response in the json format contaning the header - Reasoning, Remedies, Action_to_Take.The provided data is sufficient to take a judgement on. The data of the patient is here - {patient_details}")
+                    print(convo.last.text)
+
+                    ai_prescription = convo.last.text
         chats = ChatModel.objects.all()
 
-        patient = ProfileModel.objects.get(link=link)
-        csv_file_path = f'BaseAPI/data/{patient}.csv'
-        if not os.path.isfile(csv_file_path):
-            # Create a new file and write data to it
-            with open(csv_file_path, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'])        
-        patient_df = pd.read_csv(csv_file_path, on_bad_lines='skip')
-        
-        generation_config = {
-        "temperature": 0.2,
-        "top_p": 0.95,
-        "top_k": 0,
-        "max_output_tokens": 8192,
-        }
-        safety_settings = [
-        {
-            "category": "HARM_CATEGORY_HARASSMENT",
-            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-            "category": "HARM_CATEGORY_HATE_SPEECH",
-            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        ]
-
-        model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
-                                    generation_config=generation_config,
-                                    safety_settings=safety_settings)
-
-        convo = model.start_chat(history=[
-            
-        ])
-        patient_details =patient_df.to_string()
-        print(patient_details)
-        convo.send_message("You're a professional heart specialist doctor, you're provided with the task to analyze the heart feature data and provide the response in the json format contaning the header - Reasoning, Remedies, Action_to_Take.The provided data is sufficient to take a judgement on. The data of the patient is here - {patient_details}")
-        print(convo.last.text)
-
-        return render(request, 'Predict/prescription.html', {'chats': chats})
+     
+        return render(request, 'Predict/prescription.html', {'chats': chats, 'ai_prescription': ai_prescription})
     
