@@ -1,0 +1,20 @@
+from django.db import models
+
+class DataModel(models.Model):
+    # ['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'])
+    # title = models.CharField(max_length=50)
+    # age = models.IntegerField()
+    # sex = models.IntegerField()
+    user = models.CharField(max_length=20,null=True)
+    cp = models.IntegerField(null=True)
+    trestbps = models.IntegerField(null=True)
+    chol = models.IntegerField(null=True)
+    fbs = models.IntegerField(null=True)
+    restecg = models.IntegerField(null=True)
+    thalach = models.IntegerField(null=True)
+    exang = models.IntegerField(null=True)
+    oldpeak = models.FloatField(null=True)
+    slop = models.IntegerField(null=True)
+    ca = models.IntegerField(null=True)
+    thal = models.IntegerField(null=True)
+    created_at = models.DateField(auto_now_add=True)
