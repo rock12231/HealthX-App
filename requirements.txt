@@ -6,3 +6,7 @@ matplotlib==3.8.4
 numpy==1.26.4
 pandas==2.2.2
 scikit-learn==1.2.2
+python-dotenv==1.0.1
+google-generativeai==0.5.2
+whitenoise==6.6.0
+gunicorn==22.0.0
